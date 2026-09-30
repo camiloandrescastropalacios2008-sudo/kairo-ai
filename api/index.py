@@ -18,135 +18,34 @@ class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        self.send_response(200)
+        # Mostrar la página principal
+        if self.path == "/":
 
-        self.send_header(
-            "Content-Type",
-            "application/json"
-        )
+            try:
 
-        self.end_headers()
+                with open(
+                    "index.html",
+                    "r",
+                    encoding="utf-8"
+                ) as archivo:
 
-        respuesta = json.dumps({
-            "status": "Kairo API funcionando"
-        })
-
-        self.wfile.write(
-            respuesta.encode("utf-8")
-        )
+                    contenido = archivo.read()
 
 
-    def do_POST(self):
+                self.send_response(200)
 
-        try:
-
-            longitud = int(
-                self.headers.get(
-                    "Content-Length",
-                    0
-                )
-            )
-
-            cuerpo = self.rfile.read(
-                longitud
-            )
-
-            datos = json.loads(cuerpo)
-
-            mensaje = datos.get(
-                "message",
-                ""
-            ).strip()
-
-            if not mensaje:
-
-                self.enviar_json(
-                    {
-                        "error":
-                        "Mensaje vacío."
-                    },
-                    400
+                self.send_header(
+                    "Content-Type",
+                    "text/html; charset=utf-8"
                 )
 
-                return
+                self.end_headers()
 
+                self.wfile.write(
+                    contenido.encode("utf-8")
+                )
 
-            prompt = f"""
-Eres Kairo, un asistente de inteligencia artificial.
+            except Exception as error:
 
-Fuiste creado por C. Castro como un proyecto
-de inteligencia artificial.
+                self
 
-Si te preguntan quién te creó, responde:
-
-"Fui creado por C. Castro como un proyecto
-de inteligencia artificial."
-
-Gemini es el modelo de inteligencia artificial
-que utilizas como base.
-
-Responde siempre en español.
-Sé claro, natural y útil.
-Mantente en el tema.
-
-Mensaje del usuario:
-
-{mensaje}
-"""
-
-
-            respuesta = client.models.generate_content(
-                model=MODEL,
-                contents=prompt
-            )
-
-
-            texto = respuesta.text.strip()
-
-
-            self.enviar_json(
-                {
-                    "answer": texto
-                },
-                200
-            )
-
-
-        except Exception as error:
-
-            self.enviar_json(
-                {
-                    "error": str(error)
-                },
-                500
-            )
-
-
-    def enviar_json(
-        self,
-        datos,
-        codigo
-    ):
-
-        resultado = json.dumps(
-            datos,
-            ensure_ascii=False
-        )
-
-        self.send_response(codigo)
-
-        self.send_header(
-            "Content-Type",
-            "application/json; charset=utf-8"
-        )
-
-        self.send_header(
-            "Access-Control-Allow-Origin",
-            "*"
-        )
-
-        self.end_headers()
-
-        self.wfile.write(
-            resultado.encode("utf-8")
-        )

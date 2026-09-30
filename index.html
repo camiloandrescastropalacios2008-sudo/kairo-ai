@@ -2,8 +2,11 @@
 <html lang="es">
 
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>Kairo — Asistente de IA</title>
 
@@ -28,13 +31,14 @@ width:100%;
 max-width:650px;
 height:100vh;
 margin:auto;
+background:#181818;
 display:flex;
 flex-direction:column;
-background:#181818;
 }
 
 #header{
 height:65px;
+flex-shrink:0;
 display:flex;
 align-items:center;
 gap:10px;
@@ -61,6 +65,7 @@ font-weight:bold;
 #status{
 font-size:12px;
 color:#777;
+margin-top:2px;
 }
 
 #chat{
@@ -73,6 +78,7 @@ overflow-y:auto;
 display:flex;
 gap:7px;
 margin:12px 0;
+align-items:flex-end;
 }
 
 .row.user{
@@ -87,6 +93,7 @@ background:#292929;
 display:flex;
 align-items:center;
 justify-content:center;
+font-size:16px;
 flex-shrink:0;
 }
 
@@ -112,11 +119,13 @@ border-bottom-right-radius:5px;
 
 #bottom{
 height:65px;
+flex-shrink:0;
 display:flex;
 align-items:center;
 gap:7px;
 padding:8px 10px;
 border-top:1px solid #333;
+position:relative;
 }
 
 #input{
@@ -135,19 +144,49 @@ font-size:15px;
 color:#888;
 }
 
-button{
+.action{
 width:43px;
 height:43px;
 border:0;
 border-radius:50%;
 background:#292929;
 color:white;
-font-size:18px;
+font-size:19px;
+cursor:pointer;
+flex-shrink:0;
+}
+
+.action:active{
+transform:scale(.94);
+}
+
+#menu{
+display:none;
+position:absolute;
+bottom:62px;
+left:8px;
+background:#292929;
+padding:7px;
+border-radius:14px;
+box-shadow:0 6px 20px rgba(0,0,0,.4);
+z-index:20;
+}
+
+.menu-button{
+display:block;
+width:145px;
+padding:11px;
+margin:3px;
+border:0;
+border-radius:10px;
+background:#383838;
+color:white;
+text-align:left;
 cursor:pointer;
 }
 
-button:active{
-transform:scale(.94);
+#fileInput{
+display:none;
 }
 
 @media(max-width:650px){
@@ -159,6 +198,7 @@ height:100vh;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -185,6 +225,7 @@ En línea
 
 </div>
 
+
 <div id="chat">
 
 <div class="row bot">
@@ -201,147 +242,24 @@ Hola, soy Kairo. ¿En qué puedo ayudarte?
 
 </div>
 
+
 <div id="bottom">
 
-<button id="plus">
+<button
+id="plus"
+class="action">
 +
 </button>
+
 
 <input
 id="input"
 placeholder="Escribe un mensaje..."
 autocomplete="off">
 
-<button id="send">
+
+<button
+id="send"
+class="action">
 ➤
 </button>
-
-</div>
-
-</div>
-
-<script>
-
-const input =
-document.getElementById("input");
-
-const send =
-document.getElementById("send");
-
-const chat =
-document.getElementById("chat");
-
-function addUser(text){
-
-const row =
-document.createElement("div");
-
-row.className =
-"row user";
-
-const bubble =
-document.createElement("div");
-
-bubble.className =
-"bubble";
-
-bubble.textContent =
-text;
-
-row.appendChild(bubble);
-
-chat.appendChild(row);
-
-chat.scrollTop =
-chat.scrollHeight;
-
-}
-
-function addKairo(text){
-
-const row =
-document.createElement("div");
-
-row.className =
-"row bot";
-
-const avatar =
-document.createElement("div");
-
-avatar.className =
-"avatar-small";
-
-avatar.textContent =
-"🐉";
-
-const bubble =
-document.createElement("div");
-
-bubble.className =
-"bubble";
-
-bubble.textContent =
-text;
-
-row.appendChild(avatar);
-
-row.appendChild(bubble);
-
-chat.appendChild(row);
-
-chat.scrollTop =
-chat.scrollHeight;
-
-}
-
-async function sendMessage(){
-
-const text =
-input.value.trim();
-
-if(!text){
-return;
-}
-
-input.value = "";
-
-addUser(text);
-
-addKairo("Estoy pensando...");
-
-/*
-Aquí conectaremos el backend seguro
-de Kairo con Gemini.
-*/
-
-const messages =
-chat.querySelectorAll(".bot .bubble");
-
-messages[messages.length - 1].textContent =
-"Kairo estará conectado aquí en el siguiente paso.";
-
-}
-
-send.onclick =
-sendMessage;
-
-input.addEventListener(
-"keydown",
-function(event){
-
-if(event.key === "Enter"){
-
-event.preventDefault();
-
-sendMessage();
-
-}
-
-}
-);
-
-</script>
-
-</body>
-
-</html>

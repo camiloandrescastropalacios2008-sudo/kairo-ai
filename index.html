@@ -263,3 +263,293 @@ id="send"
 class="action">
 ➤
 </button>
+ <div id="menu">
+
+<button
+id="fileButton"
+class="menu-button">
+📄 Archivo
+</button>
+
+<button
+id="imageButton"
+class="menu-button">
+🖼️ Imagen
+</button>
+
+</div>
+
+<input
+id="fileInput"
+type="file">
+
+</div>
+
+</div>
+
+<script>
+
+const input =
+document.getElementById("input");
+
+const send =
+document.getElementById("send");
+
+const plus =
+document.getElementById("plus");
+
+const menu =
+document.getElementById("menu");
+
+const chat =
+document.getElementById("chat");
+
+const fileButton =
+document.getElementById("fileButton");
+
+const imageButton =
+document.getElementById("imageButton");
+
+const fileInput =
+document.getElementById("fileInput");
+
+
+function addUser(text){
+
+const row =
+document.createElement("div");
+
+row.className =
+"row user";
+
+const bubble =
+document.createElement("div");
+
+bubble.className =
+"bubble";
+
+bubble.textContent =
+text;
+
+row.appendChild(bubble);
+
+chat.appendChild(row);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+
+function addKairo(text){
+
+const row =
+document.createElement("div");
+
+row.className =
+"row bot";
+
+const avatar =
+document.createElement("div");
+
+avatar.className =
+"avatar-small";
+
+avatar.textContent =
+"🐉";
+
+const bubble =
+document.createElement("div");
+
+bubble.className =
+"bubble";
+
+bubble.textContent =
+text;
+
+row.appendChild(avatar);
+
+row.appendChild(bubble);
+
+chat.appendChild(row);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+return bubble;
+
+}
+
+
+async function sendMessage(){
+
+const text =
+input.value.trim();
+
+if(!text){
+return;
+}
+
+input.value = "";
+
+addUser(text);
+
+const loading =
+addKairo("Estoy pensando...");
+
+try{
+
+const response =
+await fetch("/api",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+message:text
+})
+
+});
+
+const data =
+await response.json();
+
+if(data.answer){
+
+loading.textContent =
+data.answer;
+
+}else{
+
+loading.textContent =
+"❌ Kairo no pudo responder.";
+
+}
+
+}catch(error){
+
+loading.textContent =
+"❌ Error al conectar con Kairo.";
+
+}
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+
+send.onclick =
+sendMessage;
+
+
+input.addEventListener(
+"keydown",
+function(event){
+
+if(event.key === "Enter"){
+
+event.preventDefault();
+
+sendMessage();
+
+}
+
+});
+
+
+plus.onclick =
+function(event){
+
+event.stopPropagation();
+
+if(menu.style.display === "block"){
+
+menu.style.display =
+"none";
+
+}else{
+
+menu.style.display =
+"block";
+
+}
+
+};
+
+
+document.addEventListener(
+"click",
+function(event){
+
+if(
+event.target !== plus &&
+!menu.contains(event.target)
+){
+
+menu.style.display =
+"none";
+
+}
+
+});
+
+
+fileButton.onclick =
+function(){
+
+menu.style.display =
+"none";
+
+fileInput.accept =
+".txt,.pdf,.docx,.csv,.xlsx,.pptx";
+
+fileInput.click();
+
+};
+
+
+imageButton.onclick =
+function(){
+
+menu.style.display =
+"none";
+
+fileInput.accept =
+"image/*";
+
+fileInput.click();
+
+};
+
+
+fileInput.onchange =
+function(){
+
+if(!fileInput.files.length){
+return;
+}
+
+const file =
+fileInput.files[0];
+
+addUser(
+"📎 " + file.name
+);
+
+addKairo(
+"📄 He recibido el archivo. La lectura de archivos la conectaremos al backend."
+);
+
+fileInput.value = "";
+
+};
+
+</script>
+
+</body>
+
+</html> 

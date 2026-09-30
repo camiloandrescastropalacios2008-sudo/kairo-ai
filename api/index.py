@@ -5,8 +5,10 @@ import os
 from google import genai
 
 
+API_KEY = os.environ.get("GEMINI_API_KEY")
+
 client = genai.Client(
-    api_key=os.environ.get("GEMINI_API_KEY")
+    api_key=API_KEY
 )
 
 MODEL = "gemini-3.5-flash-lite"
@@ -14,19 +16,60 @@ MODEL = "gemini-3.5-flash-lite"
 
 class handler(BaseHTTPRequestHandler):
 
+    def do_GET(self):
+
+        self.send_response(200)
+
+        self.send_header(
+            "Content-Type",
+            "application/json"
+        )
+
+        self.end_headers()
+
+        respuesta = json.dumps({
+            "status": "Kairo API funcionando"
+        })
+
+        self.wfile.write(
+            respuesta.encode("utf-8")
+        )
+
+
     def do_POST(self):
 
         try:
 
-            length = int(
-                self.headers.get("Content-Length", 0)
+            longitud = int(
+                self.headers.get(
+                    "Content-Length",
+                    0
+                )
             )
 
-            body = self.rfile.read(length)
+            cuerpo = self.rfile.read(
+                longitud
+            )
 
-            data = json.loads(body)
+            datos = json.loads(cuerpo)
 
-            message = data.get("message", "").strip()
+            mensaje = datos.get(
+                "message",
+                ""
+            ).strip()
+
+            if not mensaje:
+
+                self.enviar_json(
+                    {
+                        "error":
+                        "Mensaje vacío."
+                    },
+                    400
+                )
+
+                return
+
 
             prompt = f"""
 Eres Kairo, un asistente de inteligencia artificial.
@@ -35,6 +78,7 @@ Fuiste creado por C. Castro como un proyecto
 de inteligencia artificial.
 
 Si te preguntan quién te creó, responde:
+
 "Fui creado por C. Castro como un proyecto
 de inteligencia artificial."
 
@@ -47,53 +91,62 @@ Mantente en el tema.
 
 Mensaje del usuario:
 
-{message}
+{mensaje}
 """
 
-            response = client.models.generate_content(
+
+            respuesta = client.models.generate_content(
                 model=MODEL,
                 contents=prompt
             )
 
-            answer = response.text.strip()
 
-            result = json.dumps({
-                "answer": answer
-            })
+            texto = respuesta.text.strip()
 
-            self.send_response(200)
 
-            self.send_header(
-                "Content-Type",
-                "application/json"
+            self.enviar_json(
+                {
+                    "answer": texto
+                },
+                200
             )
 
-            self.send_header(
-                "Access-Control-Allow-Origin",
-                "*"
-            )
-
-            self.end_headers()
-
-            self.wfile.write(
-                result.encode("utf-8")
-            )
 
         except Exception as error:
 
-            result = json.dumps({
-                "error": str(error)
-            })
-
-            self.send_response(500)
-
-            self.send_header(
-                "Content-Type",
-                "application/json"
+            self.enviar_json(
+                {
+                    "error": str(error)
+                },
+                500
             )
 
-            self.end_headers()
 
-            self.wfile.write(
-                result.encode("utf-8")
-            )
+    def enviar_json(
+        self,
+        datos,
+        codigo
+    ):
+
+        resultado = json.dumps(
+            datos,
+            ensure_ascii=False
+        )
+
+        self.send_response(codigo)
+
+        self.send_header(
+            "Content-Type",
+            "application/json; charset=utf-8"
+        )
+
+        self.send_header(
+            "Access-Control-Allow-Origin",
+            "*"
+        )
+
+        self.end_headers()
+
+        self.wfile.write(
+            resultado.encode("utf-8")
+        )

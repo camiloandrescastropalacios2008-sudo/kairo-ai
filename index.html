@@ -1,1 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kairo — Asistente de IA</title>
+
+<meta name="description"
+content="Kairo es un asistente de inteligencia artificial creado por C. Castro.">
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+background:#0f0f0f;
+color:white;
+font-family:Arial,sans-serif;
+}
+
+#app{
+width:100%;
+max-width:650px;
+height:100vh;
+margin:auto;
+display:flex;
+flex-direction:column;
+background:#181818;
+}
+
+#header{
+height:65px;
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px 15px;
+border-bottom:1px solid #333;
+}
+
+#avatar{
+width:43px;
+height:43px;
+border-radius:50%;
+background:#292929;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:25px;
+}
+
+#name{
+font-size:19px;
+font-weight:bold;
+}
+
+#status{
+font-size:12px;
+color:#777;
+}
+
+#chat{
+flex:1;
+padding:15px;
+overflow-y:auto;
+}
+
+.row{
+display:flex;
+gap:7px;
+margin:12px 0;
+}
+
+.row.user{
+justify-content:flex-end;
+}
+
+.avatar-small{
+width:28px;
+height:28px;
+border-radius:50%;
+background:#292929;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-shrink:0;
+}
+
+.bubble{
+max-width:78%;
+padding:10px 14px;
+border-radius:18px;
+line-height:1.4;
+word-wrap:break-word;
+}
+
+.bot .bubble{
+background:#eeeeee;
+color:#111;
+border-bottom-left-radius:5px;
+}
+
+.user .bubble{
+background:#303030;
+color:white;
+border-bottom-right-radius:5px;
+}
+
+#bottom{
+height:65px;
+display:flex;
+align-items:center;
+gap:7px;
+padding:8px 10px;
+border-top:1px solid #333;
+}
+
+#input{
+flex:1;
+height:44px;
+border:0;
+outline:none;
+border-radius:23px;
+padding:0 16px;
+background:#292929;
+color:white;
+font-size:15px;
+}
+
+#input::placeholder{
+color:#888;
+}
+
+button{
+width:43px;
+height:43px;
+border:0;
+border-radius:50%;
+background:#292929;
+color:white;
+font-size:18px;
+cursor:pointer;
+}
+
+button:active{
+transform:scale(.94);
+}
+
+@media(max-width:650px){
+
+#app{
+height:100vh;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<div id="header">
+
+<div id="avatar">
+🐉
+</div>
+
+<div>
+
+<div id="name">
+Kairo
+</div>
+
+<div id="status">
+En línea
+</div>
+
+</div>
+
+</div>
+
+<div id="chat">
+
+<div class="row bot">
+
+<div class="avatar-small">
+🐉
+</div>
+
+<div class="bubble">
+Hola, soy Kairo. ¿En qué puedo ayudarte?
+</div>
+
+</div>
+
+</div>
+
+<div id="bottom">
+
+<button id="plus">
++
+</button>
+
+<input
+id="input"
+placeholder="Escribe un mensaje..."
+autocomplete="off">
+
+<button id="send">
+➤
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const input =
+document.getElementById("input");
+
+const send =
+document.getElementById("send");
+
+const chat =
+document.getElementById("chat");
+
+function addUser(text){
+
+const row =
+document.createElement("div");
+
+row.className =
+"row user";
+
+const bubble =
+document.createElement("div");
+
+bubble.className =
+"bubble";
+
+bubble.textContent =
+text;
+
+row.appendChild(bubble);
+
+chat.appendChild(row);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+function addKairo(text){
+
+const row =
+document.createElement("div");
+
+row.className =
+"row bot";
+
+const avatar =
+document.createElement("div");
+
+avatar.className =
+"avatar-small";
+
+avatar.textContent =
+"🐉";
+
+const bubble =
+document.createElement("div");
+
+bubble.className =
+"bubble";
+
+bubble.textContent =
+text;
+
+row.appendChild(avatar);
+
+row.appendChild(bubble);
+
+chat.appendChild(row);
+
+chat.scrollTop =
+chat.scrollHeight;
+
+}
+
+async function sendMessage(){
+
+const text =
+input.value.trim();
+
+if(!text){
+return;
+}
+
+input.value = "";
+
+addUser(text);
+
+addKairo("Estoy pensando...");
+
+/*
+Aquí conectaremos el backend seguro
+de Kairo con Gemini.
+*/
+
+const messages =
+chat.querySelectorAll(".bot .bubble");
+
+messages[messages.length - 1].textContent =
+"Kairo estará conectado aquí en el siguiente paso.";
+
+}
+
+send.onclick =
+sendMessage;
+
+input.addEventListener(
+"keydown",
+function(event){
+
+if(event.key === "Enter"){
+
+event.preventDefault();
+
+sendMessage();
+
+}
+
+}
+);
+
+</script>
+
+</body>
+
+</html>
